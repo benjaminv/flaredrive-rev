@@ -1,45 +1,49 @@
 {
-  "name": "flaredrive",
-  "compatibility_date": "2026-01-14",
-  "main": "./backend/index.ts",
-  "assets": {
-    "not_found_handling": "single-page-application",
-  },
-  "compatibility_flags": ["nodejs_compat"],
-  "d1_databases": [
-    {
-      "binding": "D1",
-      "database_name": "flaredrive",
-      "database_id": "f3d07a76-273f-4075-906b-c6292ee4cfb9",
-      "migrations_dir": "drizzle",
-    },
-  ],
-  "kv_namespaces": [
-    {
-      "binding": "KV",
-      "id": "a2c1ad5a6bd84771bb91b8310b6cb49a",
-    },
-  ],
-  "durable_objects": {
-    "bindings": [
-      {
-        "name": "SESSION_REVOCATION",
-        "class_name": "SessionRevocationDO",
-      },
-    ],
-  },
-  "migrations": [
-    {
-      "tag": "do-session-revocation-v1",
-      "new_classes": ["SessionRevocationDO"],
-    },
-  ],
-  "vars": {
-    "ALLOW_REGISTER": "false",
-  },
-  "observability": {
-    "logs": {
-      "enabled": true,
-    },
-  },
+	"name": "flaredrive",
+	"compatibility_date": "2026-01-14",
+	"main": "./backend/index.ts",
+	"assets": {
+		"not_found_handling": "single-page-application",
+	},
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"d1_databases": [
+		{
+			"binding": "D1",
+			"database_name": "flaredrive",
+			"database_id": "b4927c8f-d6ed-4b0b-b443-278326c2773b",
+			"migrations_dir": "drizzle",
+		},
+	],
+	"kv_namespaces": [
+		{
+			"binding": "KV",
+			"id": "b9f72322c70741ca9aaeb7667998a14d",
+		},
+	],
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "SESSION_REVOCATION",
+				"class_name": "SessionRevocationDO",
+			},
+		],
+	},
+	"migrations": [
+		{
+			"tag": "do-session-revocation-v1",
+			"new_sqlite_classes": [
+				"SessionRevocationDO"
+			],
+		},
+	],
+	"vars": {
+		"ALLOW_REGISTER": "true",
+	},
+	"observability": {
+		"logs": {
+			"enabled": true,
+		},
+	},
 }
