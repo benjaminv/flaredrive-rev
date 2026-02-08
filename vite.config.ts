@@ -5,6 +5,8 @@ import { config } from 'dotenv'
 import { defineConfig } from 'vite'
 import Vue from '@vitejs/plugin-vue'
 import VueJsx from '@vitejs/plugin-vue-jsx'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 import { cloudflare } from '@cloudflare/vite-plugin'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
@@ -20,34 +22,56 @@ config({
   override: true,
 })
 
+const USE_REACT = process.env.FRONTEND === 'react'
+const projectRoot = import.meta.dirname
+
+// Vue plugins
+const vuePlugins = [
+  VueRouter({
+    routesFolder: 'frontend/pages',
+    dts: 'frontend/typed-router.d.ts',
+  }),
+  Vue(),
+  VueJsx(),
+  AutoImport({
+    dts: 'frontend/auto-imports.d.ts',
+    dtsMode: 'overwrite',
+    imports: ['vue', 'vue-router', 'pinia', '@vueuse/core'],
+    vueTemplate: true,
+    vueDirectives: true,
+    dirs: ['frontend/composables', 'frontend/stores', 'frontend/utils', 'common/'],
+  }),
+  Components({
+    dts: 'frontend/components.d.ts',
+    dirs: ['frontend/components'],
+    directoryAsNamespace: true,
+    collapseSamePrefixes: true,
+    resolvers: [NaiveUiResolver()],
+  }),
+  UnoCSS({}),
+]
+
+// React plugins
+const reactPlugins = [react(), tailwindcss()]
+
 export default defineConfig({
+  // React uses frontend-react as root; Vue uses project root
+  root: USE_REACT ? resolve(projectRoot, 'frontend-react') : undefined,
+  publicDir: resolve(projectRoot, 'public'),
   plugins: [
-    VueRouter({
-      routesFolder: 'frontend/pages',
-      dts: 'frontend/typed-router.d.ts',
+    ...(USE_REACT ? reactPlugins : vuePlugins),
+    cloudflare({
+      // For React: point config and state back to project root
+      ...(USE_REACT
+        ? {
+            configPath: resolve(projectRoot, 'wrangler.jsonc'),
+            persistState: { path: resolve(projectRoot, '.wrangler/state') },
+          }
+        : {}),
     }),
-    Vue(),
-    VueJsx(),
-    AutoImport({
-      dts: 'frontend/auto-imports.d.ts',
-      dtsMode: 'overwrite',
-      imports: ['vue', 'vue-router', 'pinia', '@vueuse/core'],
-      vueTemplate: true,
-      vueDirectives: true,
-      dirs: ['frontend/composables', 'frontend/stores', 'frontend/utils', 'common/'],
-    }),
-    Components({
-      dts: 'frontend/components.d.ts',
-      dirs: ['frontend/components'],
-      directoryAsNamespace: true,
-      collapseSamePrefixes: true,
-      resolvers: [NaiveUiResolver()],
-    }),
-    UnoCSS({}),
-    cloudflare(),
   ],
   build: {
-    outDir: 'dist',
+    outDir: resolve(projectRoot, 'dist'),
     emptyOutDir: true,
   },
   esbuild: {
@@ -55,7 +79,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': resolve(import.meta.dirname, 'frontend'),
+      '@': resolve(projectRoot, USE_REACT ? 'frontend-react' : 'frontend'),
     },
   },
   server: {

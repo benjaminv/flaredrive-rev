@@ -1,0 +1,102 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersDark;
+}
+
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  --color-base-100: oklch(1 0 0);
+  --color-base-200: oklch(0.96 0 0);
+  --color-base-300: oklch(0.92 0 0);
+  --color-base-content: oklch(0.25 0 0);
+  --color-primary: oklch(0.65 0.17 55);
+  --color-primary-content: oklch(1 0 0);
+  --color-secondary: oklch(0.55 0.15 260);
+  --color-secondary-content: oklch(1 0 0);
+  --color-accent: oklch(0.65 0.17 55);
+  --color-accent-content: oklch(1 0 0);
+  --color-neutral: oklch(0.35 0 0);
+  --color-neutral-content: oklch(0.98 0 0);
+  --color-error: oklch(0.55 0.2 25);
+  --color-error-content: oklch(1 0 0);
+  --color-success: oklch(0.6 0.18 155);
+  --color-success-content: oklch(1 0 0);
+  --color-warning: oklch(0.7 0.15 85);
+  --color-warning-content: oklch(0.25 0 0);
+  --color-info: oklch(0.6 0.15 245);
+  --color-info-content: oklch(1 0 0);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.75rem;
+}
+
+@plugin "daisyui/theme" {
+  name: "dark";
+  prefersDark: true;
+  --color-base-100: oklch(0.22 0.01 260);
+  --color-base-200: oklch(0.18 0.01 260);
+  --color-base-300: oklch(0.15 0.01 260);
+  --color-base-content: oklch(0.9 0 0);
+  --color-primary: oklch(0.7 0.17 55);
+  --color-primary-content: oklch(0.15 0 0);
+  --color-secondary: oklch(0.6 0.15 260);
+  --color-secondary-content: oklch(0.15 0 0);
+  --color-accent: oklch(0.7 0.17 55);
+  --color-accent-content: oklch(0.15 0 0);
+  --color-neutral: oklch(0.35 0 0);
+  --color-neutral-content: oklch(0.9 0 0);
+  --color-error: oklch(0.6 0.2 25);
+  --color-error-content: oklch(1 0 0);
+  --color-success: oklch(0.65 0.18 155);
+  --color-success-content: oklch(1 0 0);
+  --color-warning: oklch(0.75 0.15 85);
+  --color-warning-content: oklch(0.2 0 0);
+  --color-info: oklch(0.65 0.15 245);
+  --color-info-content: oklch(1 0 0);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.75rem;
+}
+
+/* Base styles matching Vue */
+:root {
+  font-size: 16px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Monospace font stack */
+code,
+pre,
+kbd,
+samp {
+  font-family: 'Maple Mono NF CN', 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+}
+
+/* Inline code styling */
+:not(pre) > code {
+  background-color: oklch(0.9 0 0);
+  padding: 0.15em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+}
+
+/* Prose styles for markdown content */
+.prose img {
+  max-width: 100%;
+  border-radius: 0.5rem;
+}
+
+/* Mobile drawer animation */
+@keyframes slide-in-left {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+.animate-slide-in-left {
+  animation: slide-in-left 0.2s ease-out;
+}
