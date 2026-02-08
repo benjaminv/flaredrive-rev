@@ -219,6 +219,7 @@ import {
   IconUpload,
 } from '@tabler/icons-vue'
 import { NFormItem, NInput, NSkeleton, useMessage, useModal } from 'naive-ui'
+import fexios from 'fexios'
 import type { Component } from 'vue'
 import type { BrowserLayout } from '@/stores/prefs'
 
@@ -432,12 +433,19 @@ async function onTogglePublic(item: StorageListObject) {
   }
 }
 async function onDownload(item: StorageListObject) {
-  const url = bucket.getCDNUrl(item)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = item.key.split('/').pop() || `FlareDrive_download_${Date.now()}`
-  a.click()
-  nmessage.success('Download started')
+  try {
+    const { data } = await fexios.post(`/api/objects/${bucketId.value}/presign`, {
+      action: 'get',
+      key: item.key,
+      download: true,
+      fileName: item.key.split('/').pop() || 'download',
+    })
+    if (data?.url) {
+      window.open(data.url, '_self')
+    }
+  } catch (e: any) {
+    nmessage.error(e?.message || 'Download failed')
+  }
 }
 async function onRename(item: StorageListObject) {
   const toPathInput = ref(item.key)

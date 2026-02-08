@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
+import fexios from 'fexios'
 import { useBucket } from '../contexts/bucket'
 import { usePrefs, type BrowserLayout, type SortOrder } from '../contexts/prefs'
 import type { StorageListObject, StorageListResult } from '../../frontend/models/BucketClient'
@@ -165,12 +166,20 @@ const BucketBrowserPage = () => {
     })
   }
 
-  const handleDownload = (item: StorageListObject) => {
-    const url = bucket.getCDNUrl(item)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = item.key.split('/').pop() || 'download'
-    a.click()
+  const handleDownload = async (item: StorageListObject) => {
+    try {
+      const { data } = await fexios.post(`/api/objects/${bucketId}/presign`, {
+        action: 'get',
+        key: item.key,
+        download: true,
+        fileName: item.key.split('/').pop() || 'download',
+      })
+      if (data?.url) {
+        window.open(data.url, '_self')
+      }
+    } catch (e: any) {
+      toastError(e.message || 'Download failed')
+    }
   }
 
   const handleCopyUrl = async (item: StorageListObject) => {
