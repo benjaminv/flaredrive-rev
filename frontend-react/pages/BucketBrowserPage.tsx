@@ -27,6 +27,9 @@ const BucketBrowserPage = () => {
   const [objects, setObjects] = useState<StorageListObject[]>([])
   const [folders, setFolders] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(false)
+  const [moreAfter, setMoreAfter] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [showCreateFolder, setShowCreateFolder] = useState(false)
   const [newFolderName, setNewFolderName] = useState('')
@@ -83,12 +86,34 @@ const BucketBrowserPage = () => {
       const { data } = await bucket.list(currentPath, { delimiter: '/' })
       setObjects(data.objects.filter((o: StorageListObject) => o.key !== currentPath))
       setFolders(data.folders || [])
+      setHasMore(data.hasMore || false)
+      setMoreAfter(data.moreAfter || null)
     } catch (e) {
       console.error('Failed to list', e)
     } finally {
       setIsLoading(false)
     }
   }, [bucketId, currentPath, bucket.list]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const loadMore = useCallback(async () => {
+    if (!bucketId || !moreAfter || isLoadingMore) return
+    setIsLoadingMore(true)
+    try {
+      const { data } = await bucket.list(currentPath, { delimiter: '/', startAfter: moreAfter })
+      const newObjects = data.objects.filter((o: StorageListObject) => o.key !== currentPath)
+      setObjects(prev => [...prev, ...newObjects])
+      // Merge any new folders (unlikely but safe)
+      if (data.folders?.length) {
+        setFolders(prev => [...new Set([...prev, ...data.folders])])
+      }
+      setHasMore(data.hasMore || false)
+      setMoreAfter(data.moreAfter || null)
+    } catch (e) {
+      toastError('Failed to load more items')
+    } finally {
+      setIsLoadingMore(false)
+    }
+  }, [bucketId, currentPath, moreAfter, isLoadingMore, bucket.list]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { loadListing() }, [loadListing])
 
@@ -436,6 +461,16 @@ const BucketBrowserPage = () => {
           onNavigate={navigateToFolder}
           onPreview={setPreviewItem}
         />
+      )}
+
+      {/* Load More */}
+      {!isLoading && hasMore && (
+        <div className="flex justify-center py-4">
+          <button className="btn btn-ghost btn-sm gap-2" onClick={loadMore} disabled={isLoadingMore}>
+            {isLoadingMore ? <span className="loading loading-spinner loading-xs" /> : null}
+            {isLoadingMore ? 'Loading...' : 'Load More'}
+          </button>
+        </div>
       )}
 
       {/* Preview Modal */}

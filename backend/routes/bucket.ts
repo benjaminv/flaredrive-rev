@@ -71,7 +71,7 @@ bucket.get('*', async (ctx) => {
   if (cfg.ownerUserId !== user.id) return ctx.json({ error: 'Forbidden' }, 403)
 
   const path = getFilePath(ctx)
-  const limit = Math.min(1000, ctx.req.query('limit') ? parseInt(ctx.req.query('limit')) : 1000)
+  const limit = Math.min(200, ctx.req.query('limit') ? parseInt(ctx.req.query('limit')) : 200)
   const startAfter = ctx.req.query('startAfter') || ''
 
   const adapter = createAdapterFromConfig(cfg)
